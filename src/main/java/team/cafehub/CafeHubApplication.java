@@ -1,4 +1,4 @@
-package team191.cafehub;
+package team.cafehub;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  db:
+    platform: linux/arm64
+    image: postgres:16
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      POSTGRESQL_ROOT_PASSWORD: ${POSTGRESQLDB_ROOT_PASSWORD}
+      POSTGRESQL_DATABASE: ${POSTGRESQLDB_DATABASE}
+    ports:
+      - ${POSTGRESQL_LOCAL_PORT}:${POSTGRESQL_DOCKER_PORT}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRESQLDB_USER} -d ${POSTGRESQLDB_DATABASE}" ]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+      timeout: 5s
+  redis:
+    platform: linux/arm64
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 10
+      start_period: 10s
+      timeout: 5s
+
+  app:
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    platform: linux/arm64
+    restart: on-failure
+    image: cafe-hub
+    build: .
+    env_file: ./.env
+    ports:
+      - ${SPRING_LOCAL_PORT}:${SPRING_DOCKER_PORT}
+      - ${DEBUG_PORT}:${DEBUG_PORT}
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${POSTGRESQL_DOCKER_PORT}/${POSTGRESQLDB_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRESQLDB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRESQLDB_ROOT_PASSWORD}
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL10Dialect
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:$DEBUG_PORT"
+    command: [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
