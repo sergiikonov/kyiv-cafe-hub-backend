@@ -9,7 +9,7 @@ public record UserLoginRequestDto(
         @Email
         String email,
         @NotEmpty
-        @Size(min = 2, max = 30)
+        @Size(min = 6, max = 30)
         String password
 ) {
 }

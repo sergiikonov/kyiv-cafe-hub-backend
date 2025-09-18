@@ -1,14 +1,11 @@
-package team.cafehub.model.cafe;
+package team.cafehub.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import team.cafehub.model.blog_post.BlogPost;
+
+import java.util.List;
 
 @Entity
 @Table(name = "tags")
@@ -16,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class Tag {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String name;
@@ -25,4 +22,6 @@ public class Tag {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TagCategory category;
+    @ManyToMany(mappedBy = "tags")
+    private List<BlogPost> blogPosts;
 }

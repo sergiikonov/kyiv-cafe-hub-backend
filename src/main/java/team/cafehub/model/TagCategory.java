@@ -1,4 +1,4 @@
-package team.cafehub.model.cafe;
+package team.cafehub.model;
 
 public enum TagCategory {
     METRO,
