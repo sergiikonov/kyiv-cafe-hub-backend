@@ -1,4 +1,4 @@
-package team.cafehub.repository.user;
+package team.cafehub.repository.cafe;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import team.cafehub.model.cafe.Cafe;

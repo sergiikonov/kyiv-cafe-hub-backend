@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,8 +54,9 @@ public class CafeController {
 //    @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CafeResponseDto save(@RequestBody @Valid CafeRequestDto requestDto) {
-        var saved = cafeService.save(requestDto);
+    public CafeResponseDto save(@RequestBody @Valid CafeRequestDto requestDto,
+                                Authentication authentication) {
+        var saved = cafeService.save(requestDto, authentication);
         log.info(String.valueOf(saved));
         return saved;
     }
@@ -63,9 +65,10 @@ public class CafeController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     public CafeResponseDto update(@PathVariable Long id,
-                                  @RequestBody @Valid CafeUpdateRequestDto requestDto) {
-        log.info(String.valueOf(cafeService.updateById(requestDto, id)));
-        return cafeService.updateById(requestDto, id);
+                                  @RequestBody @Valid CafeUpdateRequestDto requestDto,
+                                  Authentication authentication) {
+        log.info(String.valueOf(cafeService.updateById(requestDto, id, authentication)));
+        return cafeService.updateById(requestDto, id, authentication);
     }
 
     @PreAuthorize("hasRole('ADMINISTRATOR')")

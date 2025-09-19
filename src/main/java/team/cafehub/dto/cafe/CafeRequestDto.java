@@ -1,7 +1,6 @@
 package team.cafehub.dto.cafe;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import team.cafehub.dto.image.ImageRequestDto;
 import java.math.BigDecimal;
@@ -25,7 +24,7 @@ public record CafeRequestDto(
         BigDecimal longitude,
         @NotBlank
         String hours,
-        Set<Long> tagsIds, // ids Tags
+        Set<Long> tagIds, // ids Tags
         List<ImageRequestDto> images
 ) {
 }

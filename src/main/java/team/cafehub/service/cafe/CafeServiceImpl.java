@@ -3,49 +3,59 @@ package team.cafehub.service.cafe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.exception.EntityNotFoundException;
-import team.cafehub.mapper.CafeMapper;
-import team.cafehub.repository.user.CafeRepository;
+import team.cafehub.mapper.cafe.CafeMapper;
+import team.cafehub.model.user.User;
+import team.cafehub.repository.cafe.CafeRepository;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CafeServiceImpl implements CafeService {
     private final CafeRepository cafeRepository;
-    private final CafeMapper mapper;
+    private final CafeMapper cafeMapper;
 
     @Override
-    public CafeResponseDto save(CafeRequestDto requestDto) {
-        var cafe = mapper.cafeToModel(requestDto);
-        return mapper.toCafeResponseDto(cafeRepository.save(cafe));
+    public CafeResponseDto save(CafeRequestDto requestDto, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        var cafe = cafeMapper.cafeToModel(requestDto);
+        cafe.setUser(user);
+        cafe.setViews(0);
+        return cafeMapper.toCafeResponseDto(cafeRepository.save(cafe));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<CafeResponseDto> findAll(Pageable pageable) {
-        return cafeRepository.findAll(pageable).map(mapper::toCafeResponseDto);
+        return cafeRepository.findAll(pageable).map(cafeMapper::toCafeResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CafeResponseDto findById(Long id) {
-        return mapper.toCafeResponseDto(cafeRepository.findById(id).orElseThrow(
+        var cafe = cafeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't find cafe by id: " + id)
-        ));
+        );
+        cafe.setViews(cafe.getViews() + 1);
+        return cafeMapper.toCafeResponseDto(cafe);
     }
 
     @Override
-    public CafeResponseDto updateById(CafeUpdateRequestDto requestDto, Long id) {
+    public CafeResponseDto updateById(CafeUpdateRequestDto requestDto, Long id,
+                                      Authentication authentication) {
         var cafeToUpdate = cafeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't find cafe by id: " + id)
         );
-        mapper.updateCafeFromDto(requestDto, cafeToUpdate);
-        return mapper.toCafeResponseDto(cafeRepository.save(cafeToUpdate));
+        User user = (User) authentication.getPrincipal();
+        cafeMapper.updateCafeFromDto(requestDto, cafeToUpdate);
+        cafeToUpdate.setUser(user);
+        return cafeMapper.toCafeResponseDto(cafeRepository.save(cafeToUpdate));
     }
 
     @Override

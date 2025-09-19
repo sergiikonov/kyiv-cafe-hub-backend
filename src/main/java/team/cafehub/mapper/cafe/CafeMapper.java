@@ -1,4 +1,4 @@
-package team.cafehub.mapper;
+package team.cafehub.mapper.cafe;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -9,7 +9,7 @@ import team.cafehub.dto.cafe.CafeResponseDto;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.model.cafe.Cafe;
 
-@Mapper(componentModel = "spring", config = MapStructConfig.class)
+@Mapper(componentModel = "spring", config = MapStructConfig.class, implementationName = "CafeMapperImpl")
 public interface CafeMapper {
     CafeResponseDto toCafeResponseDto(Cafe cafe);
 
