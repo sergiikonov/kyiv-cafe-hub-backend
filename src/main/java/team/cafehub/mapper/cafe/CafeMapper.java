@@ -1,8 +1,6 @@
 package team.cafehub.mapper.cafe;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import team.cafehub.config.MapStructConfig;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
@@ -15,9 +13,19 @@ public interface CafeMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    Cafe cafeToModel(CafeRequestDto cafeRequestDto);
+    @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "images", ignore = true)
+    Cafe cafeToModel(CafeRequestDto cafeRequestDto, @Context CafeMapperHelper helper);
+
+    @AfterMapping
+    default void afterCafeRequestDtoToCafe(CafeRequestDto dto,
+                                           @MappingTarget Cafe cafe, @Context CafeMapperHelper helper) {
+        helper.mapTagsAndImages(dto, cafe);
+    }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "images", ignore = true)
     void updateCafeFromDto(CafeUpdateRequestDto dto, @MappingTarget Cafe cafe);
 }

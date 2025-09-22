@@ -11,6 +11,7 @@ import team.cafehub.dto.cafe.CafeResponseDto;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.exception.EntityNotFoundException;
 import team.cafehub.mapper.cafe.CafeMapper;
+import team.cafehub.mapper.cafe.CafeMapperHelper;
 import team.cafehub.model.user.User;
 import team.cafehub.repository.cafe.CafeRepository;
 
@@ -20,11 +21,12 @@ import team.cafehub.repository.cafe.CafeRepository;
 public class CafeServiceImpl implements CafeService {
     private final CafeRepository cafeRepository;
     private final CafeMapper cafeMapper;
+    private final CafeMapperHelper cafeMapperHelper;
 
     @Override
     public CafeResponseDto save(CafeRequestDto requestDto, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        var cafe = cafeMapper.cafeToModel(requestDto);
+        var cafe = cafeMapper.cafeToModel(requestDto, cafeMapperHelper);
         cafe.setUser(user);
         cafe.setViews(0);
         return cafeMapper.toCafeResponseDto(cafeRepository.save(cafe));
