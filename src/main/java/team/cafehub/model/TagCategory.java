@@ -5,5 +5,6 @@ public enum TagCategory {
     VIBE,
     MENU,
     ACCESSIBILITY,
-    BUDGET
+    BUDGET,
+    OTHER // for blogpost
 }

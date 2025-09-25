@@ -1,6 +1,19 @@
 package team.cafehub.model.blog_post;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,6 +25,7 @@ import team.cafehub.model.Tag;
 import team.cafehub.model.user.User;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -28,10 +42,14 @@ public class BlogPost {
     @Column(length = 512)
     private String excerpt;
     @Column(nullable = false)
-    private String content;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    private String content; // text*
+    @ManyToMany
+    @JoinTable(
+            name = "blog_post_categories",
+            joinColumns = @JoinColumn(name = "blog_post_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories;
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)
     private List<Image> images;
     @CreationTimestamp
@@ -52,5 +70,5 @@ public class BlogPost {
             name = "blog_post_tags",
             joinColumns = @JoinColumn(name = "blog_post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<Tag> tags;
+    private Set<Tag> tags;
 }

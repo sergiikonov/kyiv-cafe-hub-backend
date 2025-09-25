@@ -1,12 +1,7 @@
 package team.cafehub.model.blog_post;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
@@ -22,6 +17,6 @@ public class Category {
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
-    @OneToMany(mappedBy = "category")
+    @ManyToMany(mappedBy = "categories") // Зв'язок з BlogPost
     private Set<BlogPost> blogPosts = new HashSet<>();
 }

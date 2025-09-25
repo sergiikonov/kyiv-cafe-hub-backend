@@ -30,7 +30,7 @@ public class Cafe {
     @Column(nullable = false)
     private String excerpt;
     @Column(nullable = false)
-    private String description;
+    private String description; // text *
     @Column(nullable = false)
     private String name;
     @Column(unique = true, nullable = true)
