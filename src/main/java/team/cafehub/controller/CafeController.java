@@ -2,6 +2,7 @@ package team.cafehub.controller;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ import team.cafehub.service.cafe.CafeService;
 public class CafeController {
     private final CafeService cafeService;
 
+    @Operation(summary = "Get all cafes",
+            description = "This endpoint retrieves a paginated list of cafes sorted by name.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public Page<CafeResponseDto> getAll(Pageable pageable) {
@@ -36,6 +39,8 @@ public class CafeController {
         return cafeService.findAll(pageable);
     }
 
+    @Operation(summary = "Get cafe by ID",
+            description = "This endpoint returns a single cafe by its unique ID.")
     @GetMapping("/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Found the cafe"),
@@ -46,6 +51,9 @@ public class CafeController {
         return cafeService.findById(id);
     }
 
+    @Operation(summary = "Create a new cafe",
+            description = "This endpoint creates a new cafe and is accessible only " +
+                    "by users with the ADMINISTRATOR role.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -56,6 +64,9 @@ public class CafeController {
         return saved;
     }
 
+    @Operation(summary = "Update a cafe by ID",
+            description = "This endpoint updates an existing cafe by its ID and is " +
+                    "accessible only by users with the ADMINISTRATOR role.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
@@ -66,6 +77,9 @@ public class CafeController {
         return cafeService.updateById(requestDto, id, authentication);
     }
 
+    @Operation(summary = "Delete a cafe by ID",
+            description = "This endpoint deletes a cafe by its ID and is " +
+                    "accessible only by users with the ADMINISTRATOR role.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -73,6 +87,8 @@ public class CafeController {
         cafeService.deleteById(id);
     }
 
+    @Operation(summary = "Search cafes",
+            description = "This endpoint searches for cafes by tags and/or name with pagination.")
     @GetMapping("/search")
     public ResponseEntity<Page<CafeResponseDto>> searchCafes(
             @RequestParam(required = false) String[] tags,
