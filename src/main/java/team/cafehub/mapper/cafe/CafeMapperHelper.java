@@ -1,20 +1,22 @@
 package team.cafehub.mapper.cafe;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.model.Image;
 import team.cafehub.model.Tag;
 import team.cafehub.model.cafe.Cafe;
+import team.cafehub.repository.image.ImageRepository;
 import team.cafehub.repository.tag.TagRepository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class CafeMapperHelper {
-    @Autowired
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
+    private final ImageRepository imageRepository;
 
     public void mapTagsAndImages(CafeRequestDto dto, Cafe cafe) {
         if (dto.tagIds() != null) {
@@ -22,16 +24,12 @@ public class CafeMapperHelper {
             cafe.setTags(tags);
         }
 
-        if (dto.images() != null) {
-            List<Image> images = dto.images().stream()
-                    .map(imageDto -> {
-                        Image image = new Image();
-                        image.setImageUrl(imageDto.imageUrl());
-                        image.setAltText(imageDto.altText());
-                        image.setCafe(cafe);
-                        return image;
-                    })
-                    .toList();
+        if (dto.imageIds() != null && !dto.imageIds().isEmpty()) {
+            List<Image> images = imageRepository.findAllById(dto.imageIds());
+
+            // Встановлюємо зв'язок з кав'ярнею для кожного зображення
+            images.forEach(image -> image.setCafe(cafe));
+
             cafe.setImages(images);
         }
     }

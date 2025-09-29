@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
+import team.cafehub.dto.cafe.CafeSearchParameters;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 
 public interface CafeService {
@@ -18,4 +19,6 @@ public interface CafeService {
                                Authentication authentication);
 
     void deleteById(Long id);
+
+    Page<CafeResponseDto> searchCafes(CafeSearchParameters searchParameters, Pageable pageable);
 }

@@ -3,16 +3,20 @@ package team.cafehub.service.cafe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
+import team.cafehub.dto.cafe.CafeSearchParameters;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.exception.EntityNotFoundException;
 import team.cafehub.mapper.cafe.CafeMapper;
 import team.cafehub.mapper.cafe.CafeMapperHelper;
+import team.cafehub.model.cafe.Cafe;
 import team.cafehub.model.user.User;
+import team.cafehub.repository.CafeSpecificationBuilder;
 import team.cafehub.repository.cafe.CafeRepository;
 
 @Service
@@ -22,6 +26,7 @@ public class CafeServiceImpl implements CafeService {
     private final CafeRepository cafeRepository;
     private final CafeMapper cafeMapper;
     private final CafeMapperHelper cafeMapperHelper;
+    private final CafeSpecificationBuilder cafeSpecificationBuilder;
 
     @Override
     public CafeResponseDto save(CafeRequestDto requestDto, Authentication authentication) {
@@ -63,5 +68,13 @@ public class CafeServiceImpl implements CafeService {
     @Override
     public void deleteById(Long id) {
         cafeRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CafeResponseDto> searchCafes(CafeSearchParameters searchParameters, Pageable pageable) {
+        Specification<Cafe> spec = cafeSpecificationBuilder.build(searchParameters);
+        Page<Cafe> cafes = cafeRepository.findAll(spec, pageable);
+        return cafes.map(cafeMapper::toCafeResponseDto);
     }
 }

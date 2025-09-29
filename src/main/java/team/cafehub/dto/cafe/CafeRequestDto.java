@@ -25,6 +25,6 @@ public record CafeRequestDto(
         @NotBlank
         String hours,
         Set<Long> tagIds, // ids Tags
-        List<ImageRequestDto> images
+        List<Long> imageIds
 ) {
 }
