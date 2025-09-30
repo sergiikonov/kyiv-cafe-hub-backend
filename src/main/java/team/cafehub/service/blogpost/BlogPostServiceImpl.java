@@ -42,13 +42,12 @@ public class BlogPostServiceImpl implements BlogPostService {
         return blogPostRepository.findAll(pageable).map(blogPostMapper::toBlogPostResponseDto);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public BlogPostResponseDto findById(Long id) {
         var blogPost = blogPostRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't find BlogPost with id: " + id)
         );
-        blogPost.setViews(blogPost.getViews() + 1);
+        blogPostRepository.updateViews(id);
         return blogPostMapper.toBlogPostResponseDto(blogPost);
     }
 

@@ -5,9 +5,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.5</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
+        <version>3.3.4</version>
+        <relativePath/> </parent>
     <groupId>team-191</groupId>
     <artifactId>cafe-hub</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -30,9 +29,9 @@
         <java.version>21</java.version>
         <maven.checkstyle.plugin.configLocation>checkstyle.xml</maven.checkstyle.plugin.configLocation>
         <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
-        <mapstruct.version>1.6.3</mapstruct.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jjwt.version>0.12.6</jjwt.version>
-        <swagger.version>2.8.6</swagger.version>
+        <swagger.version>2.5.0</swagger.version>
     </properties>
     <dependencies>
         <dependency>
@@ -143,6 +142,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>

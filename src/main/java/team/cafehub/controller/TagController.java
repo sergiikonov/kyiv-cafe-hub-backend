@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import team.cafehub.dto.tag.TagRequestDto;
@@ -17,6 +19,7 @@ import java.util.List;
 @Tag(name = "Tag Controller",
         description = "Controller which represented for create and take tags")
 @RestController
+@Slf4j
 @RequestMapping("/tag")
 @RequiredArgsConstructor
 public class TagController {
@@ -28,8 +31,10 @@ public class TagController {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public List<TagResponseDto> getAllTags() {
-        return tagService.findAll();
+    public ResponseEntity<List<TagResponseDto>> getAllTags() {
+        var tags = tagService.findAll();
+        log.info("Found {} tags", tags.size());
+        return ResponseEntity.ok(tags);
     }
 
     @Operation(summary = "Create a new tag",
@@ -37,8 +42,10 @@ public class TagController {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public TagResponseDto createTag(@Valid @RequestBody TagRequestDto requestDto) {
-        return tagService.create(requestDto);
+    public ResponseEntity<TagResponseDto> createTag(@Valid @RequestBody TagRequestDto requestDto) {
+        var created = tagService.create(requestDto);
+        log.info(created.name());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @Operation(summary = "Get tag by ID",
@@ -49,7 +56,13 @@ public class TagController {
             @ApiResponse(responseCode = "404", description = "Tag not found")
     })
     @GetMapping("/{id}")
-    public TagResponseDto getTagById(@PathVariable Long id) {
-        return tagService.findById(id);
+    public ResponseEntity<TagResponseDto> getTagById(@PathVariable Long id) {
+        try {
+            var tag = tagService.findById(id);
+            log.info("Found tag with id {}: {}", id, tag.name());
+            return ResponseEntity.ok(tag);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

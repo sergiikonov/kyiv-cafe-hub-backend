@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,12 @@ import team.cafehub.dto.cafe.CafeResponseDto;
 import team.cafehub.dto.cafe.CafeSearchParameters;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.service.cafe.CafeService;
+import team.cafehub.service.cafe.CafeStatsService;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Tag(name = "Cafe controller",
         description = "Controller which represents CRUD for Cafes + ability to search with params")
@@ -29,14 +37,17 @@ import team.cafehub.service.cafe.CafeService;
 @RequestMapping("/cafe")
 public class CafeController {
     private final CafeService cafeService;
+    private final CafeStatsService cafeStatsService;
 
     @Operation(summary = "Get all cafes",
             description = "This endpoint retrieves a paginated list of cafes sorted by name.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public Page<CafeResponseDto> getAll(Pageable pageable) {
-        log.info(String.valueOf(cafeService.findAll(pageable)));
-        return cafeService.findAll(pageable);
+    public ResponseEntity<Page<CafeResponseDto>> getAll(
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        var cafes = cafeService.findAll(pageable);
+        log.info("Cafe size {} ", cafes.getSize());
+        return ResponseEntity.ok(cafes);
     }
 
     @Operation(summary = "Get cafe by ID",
@@ -46,9 +57,15 @@ public class CafeController {
             @ApiResponse(responseCode = "201", description = "Found the cafe"),
             @ApiResponse(responseCode = "404", description = "Cafe not found")
     })
-    public CafeResponseDto getById(@PathVariable Long id) {
-        log.info(String.valueOf(cafeService.findById(id)));
-        return cafeService.findById(id);
+    public ResponseEntity<CafeResponseDto> getById(@PathVariable Long id) {
+        try {
+            var cafe = cafeService.findById(id);
+            log.info(cafe.name());
+            System.out.println(cafe.name());
+            return ResponseEntity.ok(cafe);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @Operation(summary = "Create a new cafe",
@@ -57,11 +74,11 @@ public class CafeController {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CafeResponseDto save(@RequestBody @Valid CafeRequestDto requestDto,
+    public ResponseEntity<CafeResponseDto> save(@RequestBody @Valid CafeRequestDto requestDto,
                                 Authentication authentication) {
         var saved = cafeService.save(requestDto, authentication);
-        log.info(String.valueOf(saved));
-        return saved;
+        log.info(saved.name());
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @Operation(summary = "Update a cafe by ID",
@@ -70,11 +87,13 @@ public class CafeController {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public CafeResponseDto update(@PathVariable Long id,
-                                  @RequestBody @Valid CafeUpdateRequestDto requestDto,
-                                  Authentication authentication) {
-        log.info(String.valueOf(cafeService.updateById(requestDto, id, authentication)));
-        return cafeService.updateById(requestDto, id, authentication);
+    public ResponseEntity<CafeResponseDto> update(@PathVariable Long id,
+                                                  @RequestBody @Valid CafeUpdateRequestDto requestDto,
+                                                  Authentication authentication) {
+        log.info(requestDto.name());
+        var updatedCafe = cafeService.updateById(requestDto, id, authentication);
+        log.info(updatedCafe.name());
+        return ResponseEntity.ok(updatedCafe);
     }
 
     @Operation(summary = "Delete a cafe by ID",
@@ -83,8 +102,9 @@ public class CafeController {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         cafeService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Search cafes",
@@ -96,7 +116,24 @@ public class CafeController {
             @PageableDefault(size = 20, sort = "name") Pageable pageable) {
         Page<CafeResponseDto> result = cafeService
                 .searchCafes(new CafeSearchParameters(tags, name), pageable);
-
         return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Download cafe statistics as CSV",
+            description = "This endpoint generates and downloads a CSV file with " +
+                    "statistics for all cafes. Accessible only by administrators.")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @GetMapping("/csv")
+    public void getCafeStatsAsCsv(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setCharacterEncoding("UTF-8");
+
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String currentDateTime = dateFormatter.format(new Date());
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=cafe_stats_" + currentDateTime + ".csv";
+        response.setHeader(headerKey, headerValue);
+
+        cafeStatsService.exportCafeStatsToCsv(response.getWriter());
     }
 }

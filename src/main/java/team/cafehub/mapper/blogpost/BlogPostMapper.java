@@ -8,7 +8,10 @@ import org.mapstruct.MappingTarget;
 import team.cafehub.config.MapStructConfig;
 import team.cafehub.dto.blogpost.BlogPostRequestDto;
 import team.cafehub.dto.blogpost.BlogPostResponseDto;
+import team.cafehub.dto.blogpost.BlogPostStatsDto;
+import team.cafehub.dto.cafe.CafeStatsDto;
 import team.cafehub.model.blog_post.BlogPost;
+import team.cafehub.model.cafe.Cafe;
 
 @Mapper(componentModel = "spring", config = MapStructConfig.class)
 public interface BlogPostMapper {
@@ -39,4 +42,8 @@ public interface BlogPostMapper {
     void updateBlogPostFromDto(BlogPostRequestDto dto,
                                @MappingTarget BlogPost blogPost,
                                @Context BlogPostMapperHelper helper);
+
+    @Mapping(target = "blogName", source = "title")
+    @Mapping(target = "userEmail", source = "user.email")
+    BlogPostStatsDto toBlogStatsDto(BlogPost blogPost);
 }

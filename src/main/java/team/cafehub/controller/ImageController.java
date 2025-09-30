@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import team.cafehub.service.image.ImageService;
 @Tag(name = "Image Controller",
         description = "Controller created for add & show images")
 @RestController
+@Slf4j
 @RequestMapping("/image")
 @RequiredArgsConstructor
 public class ImageController {
@@ -27,6 +29,7 @@ public class ImageController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ImageResponseDto addImage(@Valid @RequestBody ImageRequestDto requestDto) {
+        log.info(requestDto.imageUrl());
         return imageService.addImage(requestDto);
     }
 
@@ -39,6 +42,8 @@ public class ImageController {
     })
     @GetMapping("/{id}")
     public ImageResponseDto getImageById(@PathVariable Long id) {
-        return imageService.findImageById(id);
+        var image = imageService.findImageById(id);
+        log.info(image.imageUrl());
+        return image;
     }
 }

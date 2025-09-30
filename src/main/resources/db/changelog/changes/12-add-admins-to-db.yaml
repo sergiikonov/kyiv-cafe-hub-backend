@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-initial-roles
+      author: Sergii
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: "1"
+              - column:
+                  name: name
+                  value: "ROLE_ADMINISTRATOR"
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  value: "2"
+              - column:
+                  name: name
+                  value: "ROLE_USER"
+
+  - changeSet:
+      id: insert-initial-administrators
+      author: Sergii
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: "1"
+              - column:
+                  name: email
+                  value: "administrator@gmail.com"
+              - column:
+                  name: name
+                  value: "Admin"
+              - column:
+                  name: password
+                  value: "$2a$10$rhhqk6zCN2pAixeWVHyFYO36VVxdW0HBQTjn4MGXnRkd7HFtSf/M2"
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: "2"
+              - column:
+                  name: email
+                  value: "administrator2@gmail.com"
+              - column:
+                  name: name
+                  value: "Admin2"
+              - column:
+                  name: password
+                  value: "$2a$10$TFERiSPbistMtWJsxXSWie76I4ErOHeCMuKMRKRbqUoyzqqfgwTxW"
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+
+  - changeSet:
+      id: link-administrators-to-roles
+      author: Sergii
+      changes:
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: "1"
+              - column:
+                  name: role_id
+                  value: "1"
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: "2"
+              - column:
+                  name: role_id
+                  value: "1"

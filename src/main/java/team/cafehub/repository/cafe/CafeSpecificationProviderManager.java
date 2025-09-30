@@ -1,10 +1,12 @@
-package team.cafehub.repository;
+package team.cafehub.repository.cafe;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import team.cafehub.exception.EntityNotFoundException;
 import team.cafehub.model.cafe.Cafe;
+import team.cafehub.repository.SpecificationProvider;
+import team.cafehub.repository.SpecificationProviderManager;
 
 @Component
 @RequiredArgsConstructor

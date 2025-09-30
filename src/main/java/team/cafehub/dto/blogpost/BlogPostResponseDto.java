@@ -12,7 +12,7 @@ public record BlogPostResponseDto(
         String excerpt,
         String content,
         String slug,
-        CategoryResponseDto category,
+        Set<CategoryResponseDto> categories,
         Set<TagResponseDto> tags,
         List<ImageResponseDto> images
 ) {

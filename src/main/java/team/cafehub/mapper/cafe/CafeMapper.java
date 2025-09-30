@@ -4,11 +4,14 @@ import org.mapstruct.*;
 import team.cafehub.config.MapStructConfig;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
+import team.cafehub.dto.cafe.CafeStatsDto;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.model.cafe.Cafe;
 
 @Mapper(componentModel = "spring", config = MapStructConfig.class, implementationName = "CafeMapperImpl")
 public interface CafeMapper {
+    @Mapping(target = "tags", source = "tags")
+    @Mapping(target = "images", source = "images")
     CafeResponseDto toCafeResponseDto(Cafe cafe);
 
     @Mapping(target = "id", ignore = true)
@@ -28,4 +31,8 @@ public interface CafeMapper {
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "images", ignore = true)
     void updateCafeFromDto(CafeUpdateRequestDto dto, @MappingTarget Cafe cafe);
+
+    @Mapping(target = "cafeName", source = "name")
+    @Mapping(target = "userEmail", source = "user.email")
+    CafeStatsDto toCafeStatsDto(Cafe cafe);
 }

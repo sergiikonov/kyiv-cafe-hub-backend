@@ -2,6 +2,7 @@ package team.cafehub.dto.cafe;
 
 import team.cafehub.dto.image.ImageResponseDto;
 import team.cafehub.dto.tag.TagResponseDto;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
@@ -18,5 +19,5 @@ public record CafeResponseDto(
         String hours,
         Set<TagResponseDto> tags,
         List<ImageResponseDto> images
-) {
+) implements Serializable {
 }

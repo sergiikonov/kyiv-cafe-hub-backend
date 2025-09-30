@@ -21,3 +21,7 @@ databaseChangeLog:
       file: db/changelog/changes/09-create-user-roles-table.yaml
   - include:
       file: db/changelog/changes/10-drop-category-id-create-blog-category-table.yaml
+  - include:
+      file: db/changelog/changes/11-update-description-column-type.yaml
+  - include:
+      file: db/changelog/changes/12-add-admins-to-db.yaml

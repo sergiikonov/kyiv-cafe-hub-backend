@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import team.cafehub.service.category.CategoryService;
         description = "Controller represents categories for blog-posts")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/category")
 public class CategoryController {
     private final CategoryService categoryService;
@@ -25,7 +27,9 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long id) {
-        return ResponseEntity.ok(categoryService.findById(id));
+        var category = categoryService.findById(id);
+        log.info(category.name());
+        return ResponseEntity.ok(category);
     }
 
     @Operation(summary = "Create a new category",
@@ -35,7 +39,9 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryResponseDto> create(@Valid @RequestBody
                                                           CategoryRequestDto requestDto) {
-        return ResponseEntity.ok(categoryService.create(requestDto));
+        var saved = categoryService.create(requestDto);
+        log.info(saved.name());
+        return ResponseEntity.ok(saved);
     }
 
     @Operation(summary = "Delete category by ID",
