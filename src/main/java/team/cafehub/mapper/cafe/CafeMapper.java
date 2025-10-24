@@ -1,14 +1,18 @@
 package team.cafehub.mapper.cafe;
 
-import org.mapstruct.*;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import team.cafehub.config.MapStructConfig;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
-import team.cafehub.dto.cafe.CafeStatsDto;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.model.cafe.Cafe;
 
-@Mapper(componentModel = "spring", config = MapStructConfig.class, implementationName = "CafeMapperImpl")
+@Mapper(componentModel = "spring", config = MapStructConfig.class,
+        implementationName = "CafeMapperImpl")
 public interface CafeMapper {
     @Mapping(target = "tags", source = "tags")
     @Mapping(target = "images", source = "images")
@@ -22,7 +26,8 @@ public interface CafeMapper {
 
     @AfterMapping
     default void afterCafeRequestDtoToCafe(CafeRequestDto dto,
-                                           @MappingTarget Cafe cafe, @Context CafeMapperHelper helper) {
+                                           @MappingTarget Cafe cafe,
+                                           @Context CafeMapperHelper helper) {
         helper.mapTagsAndImages(dto, cafe);
     }
 
@@ -31,8 +36,4 @@ public interface CafeMapper {
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "images", ignore = true)
     void updateCafeFromDto(CafeUpdateRequestDto dto, @MappingTarget Cafe cafe);
-
-    @Mapping(target = "cafeName", source = "name")
-    @Mapping(target = "userEmail", source = "user.email")
-    CafeStatsDto toCafeStatsDto(Cafe cafe);
 }

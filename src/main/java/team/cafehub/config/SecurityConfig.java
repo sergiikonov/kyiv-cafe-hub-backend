@@ -40,8 +40,7 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/cafe/**",
-                                        "/tag/**", // fix on prod
-                                        "/image/**",
+                                        "/blog/**",
                                         "/auth/**",
                                         "/error")
                                 .permitAll()

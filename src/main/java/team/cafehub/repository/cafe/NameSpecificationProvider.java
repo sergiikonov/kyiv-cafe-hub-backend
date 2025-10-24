@@ -15,12 +15,12 @@ public class NameSpecificationProvider implements SpecificationProvider<Cafe> {
     @Override
     public Specification<Cafe> getSpecification(String[] params) {
         return (root, query, criteriaBuilder) -> {
-            if (params == null || params.length == 0 || params[0] == null || params[0].trim().isEmpty()) {
-                return criteriaBuilder.conjunction(); // Повертаємо "завжди true" якщо параметр пустий
+            if (params == null || params.length == 0 || params[0] == null
+                    || params[0].trim().isEmpty()) {
+                return criteriaBuilder.conjunction();
             }
 
             String searchName = params[0].toLowerCase().trim();
-            // Шукаємо кав'ярні, де назва містить введений текст (case-insensitive)
             return criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("name")),
                     "%" + searchName + "%"

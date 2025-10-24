@@ -10,8 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import team.cafehub.model.blogpost.BlogPost;
 import team.cafehub.model.cafe.Cafe;
-import team.cafehub.model.blog_post.BlogPost;
 
 @Entity
 @Table(name = "images")

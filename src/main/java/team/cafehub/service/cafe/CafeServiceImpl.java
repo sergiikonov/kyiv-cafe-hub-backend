@@ -21,8 +21,8 @@ import team.cafehub.mapper.cafe.CafeMapper;
 import team.cafehub.mapper.cafe.CafeMapperHelper;
 import team.cafehub.model.cafe.Cafe;
 import team.cafehub.model.user.User;
-import team.cafehub.repository.cafe.CafeSpecificationBuilder;
 import team.cafehub.repository.cafe.CafeRepository;
+import team.cafehub.repository.cafe.CafeSpecificationBuilder;
 
 @Service
 @Transactional
@@ -90,7 +90,8 @@ public class CafeServiceImpl implements CafeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<CafeResponseDto> searchCafes(CafeSearchParameters searchParameters, Pageable pageable) {
+    public Page<CafeResponseDto> searchCafes(CafeSearchParameters searchParameters,
+                                             Pageable pageable) {
         Specification<Cafe> spec = cafeSpecificationBuilder.build(searchParameters);
         Page<Cafe> cafes = cafeRepository.findAll(spec, pageable);
         return cafes.map(cafeMapper::toCafeResponseDto);

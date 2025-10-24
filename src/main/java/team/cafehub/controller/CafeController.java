@@ -1,10 +1,9 @@
 package team.cafehub.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,18 +15,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
 import team.cafehub.dto.cafe.CafeSearchParameters;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.service.cafe.CafeService;
-import team.cafehub.service.cafe.CafeStatsService;
-
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Tag(name = "Cafe controller",
         description = "Controller which represents CRUD for Cafes + ability to search with params")
@@ -37,14 +39,14 @@ import java.util.Date;
 @RequestMapping("/cafe")
 public class CafeController {
     private final CafeService cafeService;
-    private final CafeStatsService cafeStatsService;
 
     @Operation(summary = "Get all cafes",
             description = "This endpoint retrieves a paginated list of cafes sorted by name.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public ResponseEntity<Page<CafeResponseDto>> getAll(
-            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "name",
+                    direction = Sort.Direction.ASC) Pageable pageable) {
         var cafes = cafeService.findAll(pageable);
         log.info("Cafe size {} ", cafes.getSize());
         return ResponseEntity.ok(cafes);
@@ -69,12 +71,13 @@ public class CafeController {
     }
 
     @Operation(summary = "Create a new cafe",
-            description = "This endpoint creates a new cafe and is accessible only " +
-                    "by users with the ADMINISTRATOR role.")
+            description = "This endpoint creates a new cafe and is accessible only "
+                    + "by users with the ADMINISTRATOR role.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<CafeResponseDto> save(@RequestBody @Valid CafeRequestDto requestDto,
+    public ResponseEntity<CafeResponseDto> save(@RequestBody @Valid
+                                                    CafeRequestDto requestDto,
                                 Authentication authentication) {
         var saved = cafeService.save(requestDto, authentication);
         log.info(saved.name());
@@ -82,13 +85,14 @@ public class CafeController {
     }
 
     @Operation(summary = "Update a cafe by ID",
-            description = "This endpoint updates an existing cafe by its ID and is " +
-                    "accessible only by users with the ADMINISTRATOR role.")
+            description = "This endpoint updates an existing cafe by its ID and is "
+                    + "accessible only by users with the ADMINISTRATOR role.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     public ResponseEntity<CafeResponseDto> update(@PathVariable Long id,
-                                                  @RequestBody @Valid CafeUpdateRequestDto requestDto,
+                                                  @RequestBody @Valid CafeUpdateRequestDto
+                                                          requestDto,
                                                   Authentication authentication) {
         log.info(requestDto.name());
         var updatedCafe = cafeService.updateById(requestDto, id, authentication);
@@ -97,8 +101,8 @@ public class CafeController {
     }
 
     @Operation(summary = "Delete a cafe by ID",
-            description = "This endpoint deletes a cafe by its ID and is " +
-                    "accessible only by users with the ADMINISTRATOR role.")
+            description = "This endpoint deletes a cafe by its ID and is "
+                    + "accessible only by users with the ADMINISTRATOR role.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -117,23 +121,5 @@ public class CafeController {
         Page<CafeResponseDto> result = cafeService
                 .searchCafes(new CafeSearchParameters(tags, name), pageable);
         return ResponseEntity.ok(result);
-    }
-
-    @Operation(summary = "Download cafe statistics as CSV",
-            description = "This endpoint generates and downloads a CSV file with " +
-                    "statistics for all cafes. Accessible only by administrators.")
-    @PreAuthorize("hasRole('ADMINISTRATOR')")
-    @GetMapping("/csv")
-    public void getCafeStatsAsCsv(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
-        response.setCharacterEncoding("UTF-8");
-
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-        String currentDateTime = dateFormatter.format(new Date());
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=cafe_stats_" + currentDateTime + ".csv";
-        response.setHeader(headerKey, headerValue);
-
-        cafeStatsService.exportCafeStatsToCsv(response.getWriter());
     }
 }

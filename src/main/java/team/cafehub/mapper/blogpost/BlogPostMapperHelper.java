@@ -9,8 +9,8 @@ import team.cafehub.dto.blogpost.BlogPostRequestDto;
 import team.cafehub.exception.EntityNotFoundException;
 import team.cafehub.model.Image;
 import team.cafehub.model.Tag;
-import team.cafehub.model.blog_post.BlogPost;
-import team.cafehub.model.blog_post.Category;
+import team.cafehub.model.blogpost.BlogPost;
+import team.cafehub.model.blogpost.Category;
 import team.cafehub.repository.category.CategoryRepository;
 import team.cafehub.repository.image.ImageRepository;
 import team.cafehub.repository.tag.TagRepository;
@@ -31,7 +31,8 @@ public class BlogPostMapperHelper {
             Set<Category> categories = new HashSet<>();
             for (Long categoryId : dto.categoryId()) {
                 Category category = categoryRepository.findById(categoryId)
-                        .orElseThrow(() -> new EntityNotFoundException("Category not found with id: "
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Category not found with id: "
                                 + categoryId));
                 categories.add(category);
             }

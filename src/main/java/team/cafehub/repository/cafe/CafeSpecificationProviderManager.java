@@ -18,6 +18,7 @@ public class CafeSpecificationProviderManager implements SpecificationProviderMa
         return cafeSpecificationProviders.stream()
                 .filter(p -> p.getKey().equals(key))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException("Can't find provider with key: " + key));
+                .orElseThrow(() -> new EntityNotFoundException("Can't find provider with key: "
+                        + key));
     }
 }

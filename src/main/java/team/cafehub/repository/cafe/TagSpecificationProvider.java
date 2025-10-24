@@ -18,7 +18,8 @@ public class TagSpecificationProvider implements SpecificationProvider<Cafe> {
     public Specification<Cafe> getSpecification(String[] params) {
         return (root, query, criteriaBuilder) -> {
             Join<Cafe, Tag> tags = root.join("tags");
-            return tags.get("slug").in((Object[]) params); // Фільтрація по тегу (або будь-яке інше поле)
+            return tags.get("slug").in((Object[]) params); // Фільтрація по тегу
+            // (або будь-яке інше поле)
         };
     }
 }

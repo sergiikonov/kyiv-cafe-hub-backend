@@ -2,7 +2,6 @@ package team.cafehub.dto.cafe;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import team.cafehub.dto.image.ImageRequestDto;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;

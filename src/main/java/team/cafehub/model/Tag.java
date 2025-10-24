@@ -9,10 +9,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import team.cafehub.model.blog_post.BlogPost;
-import java.util.List;
+import team.cafehub.model.blogpost.BlogPost;
 
 @Entity
 @Table(name = "tags")
