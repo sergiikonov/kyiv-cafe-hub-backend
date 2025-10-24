@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: blog_post_tags
+      author: Sergii
+      changes:
+        - createTable:
+            tableName: blog_post_tags
+            columns:
+              - column:
+                  name: blog_post_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: blog_post_tags
+            baseColumnNames: blog_post_id
+            referencedTableName: blog_posts
+            referencedColumnNames: id
+            constraintName: fk_blog_post_tags_blog_post
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: blog_post_tags
+            baseColumnNames: tag_id
+            referencedTableName: tags
+            referencedColumnNames: id
+            constraintName: fk_blog_post_tags_tag
+            onDelete: CASCADE

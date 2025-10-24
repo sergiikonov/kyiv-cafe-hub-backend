@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: update_description_column_type
+      author: Sergii
+      changes:
+        - modifyDataType:
+            columnName: description
+            newDataType: TEXT
+            tableName: cafes

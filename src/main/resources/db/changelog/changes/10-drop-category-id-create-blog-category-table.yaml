@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: remove_category_id_from_blog_posts
+      author: Sergii
+      changes:
+        - dropColumn:
+            tableName: blog_posts
+            columnName: category_id
+
+  - changeSet:
+      id: create_blog_post_categories_table
+      author: Sergii
+      changes:
+        - createTable:
+            tableName: blog_post_categories
+            columns:
+              - column:
+                  name: blog_post_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: blog_post_categories
+            baseColumnNames: blog_post_id
+            referencedTableName: blog_posts
+            referencedColumnNames: id
+            constraintName: fk_blog_post_categories_blog_post
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: blog_post_categories
+            baseColumnNames: category_id
+            referencedTableName: categories
+            referencedColumnNames: id
+            constraintName: fk_blog_post_categories_category
+            onDelete: CASCADE

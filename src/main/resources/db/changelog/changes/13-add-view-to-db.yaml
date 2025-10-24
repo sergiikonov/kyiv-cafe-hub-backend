@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 13-add-view-to-db
+      author: Sergii
+      changes:
+        - sql:
+            sql: |
+              CREATE OR REPLACE VIEW content_performance_v AS
+              WITH content_data AS (
+                  -- Select data from cafes table
+                  SELECT
+                      id AS content_id,
+                      'cafe' AS content_type,
+                      created,
+                      updated,
+                      views,
+                      is_deleted,
+                      user_id
+                  FROM cafes
+                  UNION ALL
+                  -- Select data from blog_posts table
+                  SELECT
+                      id AS content_id,
+                      'blogpost' AS content_type,
+                      created,
+                      updated,
+                      views,
+                      is_deleted,
+                      user_id
+                  FROM blog_posts
+              )
+              SELECT
+                  cd.content_id,
+                  cd.content_type,
+                  cd.user_id,
+                  cd.created,
+                  cd.updated,
+                  cd.views,
+                  cd.is_deleted,
+                  -- Content Age (in days)
+                  EXTRACT(DAY FROM (NOW() - cd.created)) AS content_age_days,
+                  -- View-to-Age Ratio (Views per day)
+                  CASE
+                      WHEN (NOW() - cd.created) < INTERVAL '1 second' THEN 0
+                      ELSE cd.views / (EXTRACT(EPOCH FROM (NOW() - cd.created)) / 86400.0)
+                  END AS views_per_day_ratio,
+                  -- Content Update Frequency (Binary: Has it been updated since creation?)
+                  (cd.updated > cd.created) AS has_been_updated
+              FROM
+                  content_data cd;
+      rollback:
+        - sql:
+            sql: DROP VIEW IF EXISTS content_performance_v;

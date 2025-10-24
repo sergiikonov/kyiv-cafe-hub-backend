@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_cafes_table
+      author: Sergii
+      changes:
+        - createTable:
+            tableName: cafes
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: excerpt
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+                    nullable: true
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: latitude
+                  type: NUMERIC(9, 6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: longitude
+                  type: NUMERIC(9, 6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_deleted
+                  type: BOOLEAN
+                  defaultValue: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: hours
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: views
+                  type: INT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+        - createIndex:
+            indexName: idx_cafes_slug
+            tableName: cafes
+            columns:
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+        - addForeignKeyConstraint:
+            baseTableName: cafes
+            baseColumnNames: user_id
+            constraintName: fk_cafes_user
+            referencedTableName: users
+            referencedColumnNames: id

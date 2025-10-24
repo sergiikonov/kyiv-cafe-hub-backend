@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_images_table
+      author: Sergii
+      changes:
+        - createTable:
+            tableName: images
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: image_url
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: alt_text
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cafe_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: blog_post_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: images
+            baseColumnNames: cafe_id
+            constraintName: fk_images_cafe
+            referencedTableName: cafes
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: images
+            baseColumnNames: blog_post_id
+            constraintName: fk_images_post
+            referencedTableName: blog_posts
+            referencedColumnNames: id

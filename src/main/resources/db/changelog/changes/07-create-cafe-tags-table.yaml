@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_cafe_tags_table
+      author: Sergii
+      changes:
+        - createTable:
+            tableName: cafe_tags
+            columns:
+              - column:
+                  name: cafe_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: cafe_tags
+            columnNames: cafe_id, tag_id
+        - addForeignKeyConstraint:
+            baseTableName: cafe_tags
+            baseColumnNames: cafe_id
+            constraintName: fk_cafe_tags_cafe
+            referencedTableName: cafes
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: cafe_tags
+            baseColumnNames: tag_id
+            constraintName: fk_cafe_tags_tag
+            referencedTableName: tags
+            referencedColumnNames: id
