@@ -1,6 +1,11 @@
 # ===== Builder stage =====
 FROM eclipse-temurin:21-jdk-jammy AS builder
 WORKDIR /application
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
