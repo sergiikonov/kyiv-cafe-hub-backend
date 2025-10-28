@@ -1,4 +1,4 @@
-# ===== Builder stage =====
+# ===== Builder stage (Стадія збірки) =====
 FROM eclipse-temurin:21-jdk-jammy AS builder
 WORKDIR /application
 COPY .mvn/ .mvn
@@ -7,8 +7,7 @@ RUN chmod +x ./mvnw
 RUN ./mvnw dependency:go-offline
 COPY src ./src
 RUN ./mvnw clean package -DskipTests -Dcheckstyle.skip=true
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} application.jar
+RUN cp target/*.jar application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
 # ===== Final (runtime) stage =====
