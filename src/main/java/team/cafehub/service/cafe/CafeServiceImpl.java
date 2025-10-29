@@ -77,7 +77,7 @@ public class CafeServiceImpl implements CafeService {
                 () -> new EntityNotFoundException("Can't find cafe by id: " + id)
         );
         User user = (User) authentication.getPrincipal();
-        cafeMapper.updateCafeFromDto(requestDto, cafeToUpdate);
+        cafeMapper.updateCafeFromDto(requestDto, cafeToUpdate, cafeMapperHelper);
         cafeToUpdate.setUser(user);
         return cafeMapper.toCafeResponseDto(cafeRepository.save(cafeToUpdate));
     }

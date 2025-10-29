@@ -35,5 +35,13 @@ public interface CafeMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "images", ignore = true)
-    void updateCafeFromDto(CafeUpdateRequestDto dto, @MappingTarget Cafe cafe);
+    void updateCafeFromDto(CafeUpdateRequestDto dto, @MappingTarget Cafe cafe,
+                           @Context CafeMapperHelper helper);
+
+    @AfterMapping
+    default void afterUpdateCafeFromDto(CafeUpdateRequestDto dto,
+                                        @MappingTarget Cafe cafe,
+                                        @Context CafeMapperHelper helper) {
+        helper.mapTagsAndImages(dto, cafe);
+    }
 }

@@ -32,6 +32,7 @@ public class ImageServiceImpl implements ImageService {
         return imageMapper.toResponse(image);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ImageResponseDto> findAllImage(Pageable pageable) {
         return imageRepository.findAll(pageable).map(imageMapper::toResponse);
