@@ -1,6 +1,8 @@
 package team.cafehub.service.image;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.cafehub.dto.image.ImageRequestDto;
@@ -28,5 +30,10 @@ public class ImageServiceImpl implements ImageService {
         var image = imageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find image by id: " + id));
         return imageMapper.toResponse(image);
+    }
+
+    @Override
+    public Page<ImageResponseDto> findAllImage(Pageable pageable) {
+        return imageRepository.findAll(pageable).map(imageMapper::toResponse);
     }
 }
