@@ -8,6 +8,7 @@ import team.cafehub.dto.category.CategoryResponseDto;
 import team.cafehub.exception.EntityNotFoundException;
 import team.cafehub.mapper.category.CategoryMapper;
 import team.cafehub.repository.category.CategoryRepository;
+import team.cafehub.util.TranslationHelper;
 
 @Service
 @Transactional
@@ -15,21 +16,22 @@ import team.cafehub.repository.category.CategoryRepository;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final TranslationHelper translationHelper;
 
     @Override
     public CategoryResponseDto create(CategoryRequestDto requestDto) {
-        return categoryMapper.toResponse(
-                categoryRepository.save(categoryMapper.toModel(requestDto))
-        );
+        var categoryToSave = categoryMapper.toModel(requestDto);
+        var savedCategory = categoryRepository.save(categoryToSave);
+        return categoryMapper.toResponse(savedCategory, "uk", translationHelper);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public CategoryResponseDto findById(Long id) {
+    public CategoryResponseDto findById(Long id, String language) {
         var category = categoryRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't find category with id: " + id)
         );
-        return categoryMapper.toResponse(category);
+        return categoryMapper.toResponse(category, language, translationHelper);
     }
 
     @Override

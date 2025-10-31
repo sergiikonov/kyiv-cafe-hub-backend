@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.cafehub.dto.blogpost.BlogPostRequestDto;
 import team.cafehub.dto.blogpost.BlogPostResponseDto;
+import team.cafehub.dto.blogpost.BlogPostUpdateRequestDto;
 import team.cafehub.service.blogpost.BlogPostService;
 
 @Tag(name = "Blog Posts Controller",
@@ -53,8 +55,9 @@ public class BlogPostController {
     @GetMapping
     public ResponseEntity<Page<BlogPostResponseDto>> getAllBlogPosts(
             @PageableDefault(size = 20, sort = "created",
-                    direction = Sort.Direction.DESC) Pageable pageable) {
-        var blog = blogPostService.findAll(pageable);
+                    direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestHeader(name = "Accept-Language", defaultValue = "uk") String language) {
+        var blog = blogPostService.findAll(pageable, language);
         log.info("Blogs found {}", blog.getSize());
         return ResponseEntity.ok(blog);
     }
@@ -62,8 +65,12 @@ public class BlogPostController {
     @Operation(summary = "Get a blog post by ID",
             description = "This endpoint returns a single blog post by its unique ID.")
     @GetMapping("/{id}")
-    public ResponseEntity<BlogPostResponseDto> getBlogPostById(@PathVariable Long id) {
-        var blog = blogPostService.findById(id);
+    public ResponseEntity<BlogPostResponseDto> getBlogPostById(@PathVariable Long id,
+                                                               @RequestHeader(
+                                                                       name = "Accept-Language",
+                                                                       defaultValue = "uk")
+                                                               String language) {
+        var blog = blogPostService.findById(id, language);
         log.info(blog.content());
         return ResponseEntity.ok(blog);
     }
@@ -75,9 +82,12 @@ public class BlogPostController {
     @PutMapping("/{id}")
     public ResponseEntity<BlogPostResponseDto> updateBlogPost(
             @PathVariable Long id,
-            @Valid @RequestBody BlogPostRequestDto requestDto, Authentication authentication) {
+            @Valid @RequestBody BlogPostUpdateRequestDto requestDto,
+            Authentication authentication,
+            @RequestHeader(name = "Accept-Language", defaultValue = "uk") String language) {
         log.info(requestDto.content());
-        return ResponseEntity.ok(blogPostService.updateById(requestDto, id, authentication));
+        return ResponseEntity.ok(blogPostService.updateById(requestDto, id,
+                authentication, language));
     }
 
     @Operation(summary = "Delete a blog post by ID",

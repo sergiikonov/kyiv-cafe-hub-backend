@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -46,8 +47,9 @@ public class CafeController {
     @GetMapping
     public ResponseEntity<Page<CafeResponseDto>> getAll(
             @PageableDefault(size = 20, sort = "name",
-                    direction = Sort.Direction.ASC) Pageable pageable) {
-        var cafes = cafeService.findAll(pageable);
+                    direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestHeader(name = "Accept-Language", defaultValue = "uk") String language) {
+        var cafes = cafeService.findAll(pageable, language);
         log.info("Cafe size {} ", cafes.getSize());
         return ResponseEntity.ok(cafes);
     }
@@ -56,18 +58,16 @@ public class CafeController {
             description = "This endpoint returns a single cafe by its unique ID.")
     @GetMapping("/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Found the cafe"),
+            @ApiResponse(responseCode = "200", description = "Found the cafe"),
             @ApiResponse(responseCode = "404", description = "Cafe not found")
     })
-    public ResponseEntity<CafeResponseDto> getById(@PathVariable Long id) {
-        try {
-            var cafe = cafeService.findById(id);
-            log.info(cafe.name());
-            System.out.println(cafe.name());
-            return ResponseEntity.ok(cafe);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<CafeResponseDto> getById(@PathVariable Long id,
+                                                   @RequestHeader(name = "Accept-Language",
+                                                           defaultValue = "uk") String language) {
+        var cafe = cafeService.findById(id, language);
+        log.info(cafe.name());
+        System.out.println(cafe.name());
+        return ResponseEntity.ok(cafe);
     }
 
     @Operation(summary = "Create a new cafe",
@@ -93,9 +93,11 @@ public class CafeController {
     public ResponseEntity<CafeResponseDto> update(@PathVariable Long id,
                                                   @RequestBody @Valid CafeUpdateRequestDto
                                                           requestDto,
-                                                  Authentication authentication) {
+                                                  Authentication authentication,
+                                                  @RequestHeader(name = "Accept-Language",
+                                                          defaultValue = "uk") String language) {
         log.info(requestDto.name());
-        var updatedCafe = cafeService.updateById(requestDto, id, authentication);
+        var updatedCafe = cafeService.updateById(requestDto, id, authentication, language);
         log.info(updatedCafe.name());
         return ResponseEntity.ok(updatedCafe);
     }
@@ -117,9 +119,10 @@ public class CafeController {
     public ResponseEntity<Page<CafeResponseDto>> searchCafes(
             @RequestParam(required = false) String[] tags,
             @RequestParam(required = false) String name,
-            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+            @PageableDefault(size = 20, sort = "name") Pageable pageable,
+            @RequestHeader(name = "Accept-Language", defaultValue = "uk") String language) {
         Page<CafeResponseDto> result = cafeService
-                .searchCafes(new CafeSearchParameters(tags, name), pageable);
+                .searchCafes(new CafeSearchParameters(tags, name), pageable, language);
         return ResponseEntity.ok(result);
     }
 }

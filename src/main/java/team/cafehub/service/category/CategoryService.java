@@ -6,7 +6,7 @@ import team.cafehub.dto.category.CategoryResponseDto;
 public interface CategoryService {
     CategoryResponseDto create(CategoryRequestDto requestDto);
 
-    CategoryResponseDto findById(Long id);
+    CategoryResponseDto findById(Long id, String language);
 
     void deleteById(Long id);
 }

@@ -24,6 +24,7 @@ public class Tag {
     private Long id;
     @Column(nullable = false)
     private String name;
+    private String nameEn;
     @Column(nullable = false, unique = true)
     private String slug; // скорочення
     @Enumerated(EnumType.STRING)

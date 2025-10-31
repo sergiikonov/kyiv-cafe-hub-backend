@@ -39,14 +39,18 @@ public class Cafe {
     private Long id;
     @Column(nullable = false)
     private String excerpt;
+    private String excerptEn;
+    private String descriptionEn;
     @Column(nullable = false)
     private String description; // text *
     @Column(nullable = false)
     private String name;
+    private String nameEn;
     @Column(unique = true, nullable = true)
     private String slug;
     @Column(nullable = false)
     private String address;
+    private String addressEn;
     @OneToMany(mappedBy = "cafe", cascade = CascadeType.ALL)
     private List<Image> images; // url
     @Column(nullable = false)
@@ -70,6 +74,7 @@ public class Cafe {
     @UpdateTimestamp
     @Column(nullable = false)
     private Date updated;
+    private String hoursEn;
     private String hours;
     private Integer views; // кількість кліків
     @OneToOne
