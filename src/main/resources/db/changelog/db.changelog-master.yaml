@@ -29,3 +29,5 @@ databaseChangeLog:
       file: db/changelog/changes/13-add-view-to-db.yaml
   - include:
       file: db/changelog/changes/14-add-name-to-content-performance-view.yaml
+  - include:
+      file: db/changelog/changes/15-add-columns-for-en-language.yaml

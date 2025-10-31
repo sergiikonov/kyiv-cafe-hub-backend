@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team.cafehub.dto.category.CategoryRequestDto;
@@ -32,8 +34,12 @@ public class CategoryController {
                     + "Accessible only by users with ADMINISTRATOR role.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long id) {
-        var category = categoryService.findById(id);
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long id,
+                                                               @RequestHeader(
+                                                                       name = "Accept-Language",
+                                                                       defaultValue = "uk")
+                                                               String language) {
+        var category = categoryService.findById(id, language);
         log.info(category.name());
         return ResponseEntity.ok(category);
     }
@@ -47,7 +53,7 @@ public class CategoryController {
                                                           CategoryRequestDto requestDto) {
         var saved = categoryService.create(requestDto);
         log.info(saved.name());
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @Operation(summary = "Delete category by ID",

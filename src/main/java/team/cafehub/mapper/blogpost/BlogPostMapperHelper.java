@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import team.cafehub.dto.blogpost.BlogPostRequestDto;
+import team.cafehub.dto.blogpost.BlogPostUpdateRequestDto;
 import team.cafehub.exception.EntityNotFoundException;
 import team.cafehub.model.Image;
 import team.cafehub.model.Tag;
@@ -45,6 +46,33 @@ public class BlogPostMapperHelper {
         }
 
         if (dto.imageIds() != null && !dto.imageIds().isEmpty()) {
+            List<Image> images = imageRepository.findAllById(dto.imageIds());
+            blogPost.setImages(images);
+        }
+    }
+
+    public void mapRelationships(BlogPostUpdateRequestDto dto, BlogPost blogPost) {
+        if (dto.categoryId() != null) {
+            Set<Category> categories = new HashSet<>();
+            for (Long categoryId : dto.categoryId()) {
+                Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Category not found with id: "
+                                        + categoryId));
+                categories.add(category);
+            }
+            blogPost.setCategories(categories);
+        }
+
+        if (dto.tagIds() != null) {
+            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.tagIds()));
+            blogPost.setTags(tags);
+        }
+
+        if (dto.imageIds() != null) {
+            // Увага: логіка для imageIds() може бути складнішою
+            // (наприклад, видалення старих, додавання нових),
+            // але поки що просто встановимо новий список.
             List<Image> images = imageRepository.findAllById(dto.imageIds());
             blogPost.setImages(images);
         }

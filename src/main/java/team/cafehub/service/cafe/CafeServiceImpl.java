@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import team.cafehub.model.cafe.Cafe;
 import team.cafehub.model.user.User;
 import team.cafehub.repository.cafe.CafeRepository;
 import team.cafehub.repository.cafe.CafeSpecificationBuilder;
+import team.cafehub.util.TranslationHelper;
 
 @Service
 @Transactional
@@ -36,54 +38,62 @@ public class CafeServiceImpl implements CafeService {
     private final CafeMapper cafeMapper;
     private final CafeMapperHelper cafeMapperHelper;
     private final CafeSpecificationBuilder cafeSpecificationBuilder;
+    private final TranslationHelper translationHelper;
 
     @Override
-    @CachePut(value = "cafe", key = "#result.id")
+    @CachePut(value = "cafe", key = "#result.id + '-uk'")
     public CafeResponseDto save(CafeRequestDto requestDto, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         var cafe = cafeMapper.cafeToModel(requestDto, cafeMapperHelper);
         cafe.setUser(user);
         cafe.setViews(0);
-        return cafeMapper.toCafeResponseDto(cafeRepository.save(cafe));
+        var savedCafe = cafeRepository.save(cafe);
+        return cafeMapper.toCafeResponseDto(savedCafe, "uk", translationHelper);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<CafeResponseDto> findAll(Pageable pageable) {
-        return cafeRepository.findAll(pageable).map(cafeMapper::toCafeResponseDto);
+    public Page<CafeResponseDto> findAll(Pageable pageable, String language) {
+        return cafeRepository.findAll(pageable).map(cafe ->
+                cafeMapper.toCafeResponseDto(cafe, language, translationHelper));
     }
 
     @Override
     @Transactional
-    public CafeResponseDto findById(Long id) {
+    public CafeResponseDto findById(Long id, String language) {
         cafeRepository.updateViews(id);
-        return selfProxy.getCafe(id);
+        return selfProxy.getCafe(id, language);
     }
 
-    @Cacheable(value = "cafe", key = "#id")
+    @Cacheable(value = "cafe", key = "#id + '-' + #language")
     @Transactional(readOnly = true)
-    public CafeResponseDto getCafe(Long id) {
+    public CafeResponseDto getCafe(Long id, String language) {
         var cafe = cafeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't find cafe by id: " + id)
         );
-        return cafeMapper.toCafeResponseDto(cafe);
+        return cafeMapper.toCafeResponseDto(cafe, language, translationHelper);
     }
 
     @Override
-    @CachePut(value = "cafe", key = "#id")
+    @CachePut(value = "cafe", key = "#id + '-' + #language")
     public CafeResponseDto updateById(CafeUpdateRequestDto requestDto, Long id,
-                                      Authentication authentication) {
+                                      Authentication authentication,
+                                      String language) {
         var cafeToUpdate = cafeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't find cafe by id: " + id)
         );
         User user = (User) authentication.getPrincipal();
         cafeMapper.updateCafeFromDto(requestDto, cafeToUpdate, cafeMapperHelper);
         cafeToUpdate.setUser(user);
-        return cafeMapper.toCafeResponseDto(cafeRepository.save(cafeToUpdate));
+        var savedCafe = cafeRepository.save(cafeToUpdate);
+        return cafeMapper.toCafeResponseDto(savedCafe, language, translationHelper);
     }
 
     @Override
-    @CacheEvict(value = "cafe", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "cafe", key = "#id + '-uk'"),
+            @CacheEvict(value = "cafe", key = "#id + '-en'")
+    })
     public void deleteById(Long id) {
         cafeRepository.deleteById(id);
     }
@@ -91,9 +101,11 @@ public class CafeServiceImpl implements CafeService {
     @Override
     @Transactional(readOnly = true)
     public Page<CafeResponseDto> searchCafes(CafeSearchParameters searchParameters,
-                                             Pageable pageable) {
+                                             Pageable pageable, String language) {
         Specification<Cafe> spec = cafeSpecificationBuilder.build(searchParameters);
         Page<Cafe> cafes = cafeRepository.findAll(spec, pageable);
-        return cafes.map(cafeMapper::toCafeResponseDto);
+        return cafes.map(cafe ->
+                cafeMapper.toCafeResponseDto(cafe, language, translationHelper)
+        );
     }
 }

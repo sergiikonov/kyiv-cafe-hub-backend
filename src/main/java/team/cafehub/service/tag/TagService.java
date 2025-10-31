@@ -7,7 +7,7 @@ import team.cafehub.dto.tag.TagResponseDto;
 public interface TagService {
     TagResponseDto create(TagRequestDto requestDto);
 
-    List<TagResponseDto> findAll();
+    List<TagResponseDto> findAll(String language);
 
-    TagResponseDto findById(Long id);
+    TagResponseDto findById(Long id, String language);
 }

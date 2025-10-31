@@ -11,14 +11,15 @@ import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 public interface CafeService {
     CafeResponseDto save(CafeRequestDto requestDto, Authentication authentication);
 
-    Page<CafeResponseDto> findAll(Pageable pageable);
+    Page<CafeResponseDto> findAll(Pageable pageable, String language);
 
-    CafeResponseDto findById(Long id);
+    CafeResponseDto findById(Long id, String language);
 
     CafeResponseDto updateById(CafeUpdateRequestDto requestDto, Long id,
-                               Authentication authentication);
+                               Authentication authentication, String language);
 
     void deleteById(Long id);
 
-    Page<CafeResponseDto> searchCafes(CafeSearchParameters searchParameters, Pageable pageable);
+    Page<CafeResponseDto> searchCafes(CafeSearchParameters searchParameters, Pageable pageable,
+                                      String language);
 }

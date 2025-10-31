@@ -22,6 +22,7 @@ public class Category {
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
+    private String nameEn;
     @ManyToMany(mappedBy = "categories") // Зв'язок з BlogPost
     private Set<BlogPost> blogPosts = new HashSet<>();
 }

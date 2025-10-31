@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +38,9 @@ public class TagController {
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public ResponseEntity<List<TagResponseDto>> getAllTags() {
-        var tags = tagService.findAll();
+    public ResponseEntity<List<TagResponseDto>> getAllTags(@RequestHeader(name = "Accept-Language",
+            defaultValue = "uk") String language) {
+        var tags = tagService.findAll(language);
         log.info("Found {} tags", tags.size());
         return ResponseEntity.ok(tags);
     }
@@ -61,17 +63,15 @@ public class TagController {
                     + "Returns 404 if the tag is not found.")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Found the tag"),
+            @ApiResponse(responseCode = "200", description = "Found the tag"),
             @ApiResponse(responseCode = "404", description = "Tag not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<TagResponseDto> getTagById(@PathVariable Long id) {
-        try {
-            var tag = tagService.findById(id);
-            log.info("Found tag with id {}: {}", id, tag.name());
-            return ResponseEntity.ok(tag);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<TagResponseDto> getTagById(@PathVariable Long id,
+                                                     @RequestHeader(name = "Accept-Language",
+                                                             defaultValue = "uk") String language) {
+        var tag = tagService.findById(id, language);
+        log.info("Found tag with id {}: {}", id, tag.name());
+        return ResponseEntity.ok(tag);
     }
 }

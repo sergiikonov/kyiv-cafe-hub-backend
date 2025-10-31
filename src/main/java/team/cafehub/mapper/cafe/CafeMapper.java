@@ -10,13 +10,26 @@ import team.cafehub.dto.cafe.CafeRequestDto;
 import team.cafehub.dto.cafe.CafeResponseDto;
 import team.cafehub.dto.cafe.CafeUpdateRequestDto;
 import team.cafehub.model.cafe.Cafe;
+import team.cafehub.util.TranslationHelper;
 
 @Mapper(componentModel = "spring", config = MapStructConfig.class,
-        implementationName = "CafeMapperImpl")
+        implementationName = "CafeMapperImpl",
+        uses = {CafeMapperHelper.class, TranslationHelper.class})
 public interface CafeMapper {
+    @Mapping(target = "name", expression = "java(helper.getTranslated(language, "
+            + "cafe.getName(), cafe.getNameEn()))")
+    @Mapping(target = "description", expression = "java(helper.getTranslated(language, "
+            + "cafe.getDescription(), cafe.getDescriptionEn()))")
+    @Mapping(target = "excerpt", expression = "java(helper.getTranslated(language, "
+            + "cafe.getExcerpt(), cafe.getExcerptEn()))")
+    @Mapping(target = "address", expression = "java(helper.getTranslated(language, "
+            + "cafe.getAddress(), cafe.getAddressEn()))")
+    @Mapping(target = "hours", expression = "java(helper.getTranslated(language, "
+            + "cafe.getHours(), cafe.getHoursEn()))")
     @Mapping(target = "tags", source = "tags")
     @Mapping(target = "images", source = "images")
-    CafeResponseDto toCafeResponseDto(Cafe cafe);
+    CafeResponseDto toCafeResponseDto(Cafe cafe, @Context String language,
+                                      @Context TranslationHelper helper);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "deleted", ignore = true)

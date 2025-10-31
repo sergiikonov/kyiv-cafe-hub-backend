@@ -1,0 +1,62 @@
+databaseChangeLog:
+  - changeSet:
+      id: 15-add-i18n-en-fields-to-tags
+      author: Sergii
+      changes:
+        - addColumn:
+            tableName: tags
+            columns:
+              - column:
+                  name: name_en
+                  type: varchar(255)
+
+  - changeSet:
+      id: 15-add-i18n-en-fields-to-categories
+      author: Sergii
+      changes:
+        - addColumn:
+            tableName: categories
+            columns:
+              - column:
+                  name: name_en
+                  type: varchar(255)
+
+  - changeSet:
+      id: 15-add-i18n-en-fields-to-cafes
+      author: Sergii
+      changes:
+        - addColumn:
+            tableName: cafes
+            columns:
+              - column:
+                  name: excerpt_en
+                  type: varchar(255)
+              - column:
+                  name: description_en
+                  type: text
+              - column:
+                  name: name_en
+                  type: varchar(255)
+              - column:
+                  name: address_en
+                  type: varchar(255)
+              - column:
+                  name: hours_en
+                  type: varchar(255)
+
+  - changeSet:
+      id: 15-add-i18n-en-fields-to-blog-posts
+      author: Sergii
+      changes:
+        - addColumn:
+            tableName: blog_posts
+            columns:
+              - column:
+                  name: title_en
+                  type: varchar(255)
+              - column:
+                  name: excerpt_en
+                  type: varchar(512)
+              - column:
+                  name: content_en
+                  type: text
